@@ -34,7 +34,7 @@ func AddScalar(s float64, m mat.Matrix) mat.Matrix {
 	return result
 }
 
-func MergeCollumns(matrices ...mat.Matrix) (mat.Matrix, error) {
+func MergeColumns(matrices ...mat.Matrix) (mat.Matrix, error) {
 	rows, cols := matrices[0].Dims()
 	result := mat.NewDense(rows*len(matrices), cols, nil)
 
