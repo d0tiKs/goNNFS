@@ -6,6 +6,9 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
+// Dot product between the two mat.Matrix m and n,
+// returns an error if m.Dims()[0] != n.Dims()[1],
+// return a matrix of size r.Dims() == {m.Dims()[0], n.Dims()[1]}.
 func Dot(m, n mat.Matrix) (mat.Matrix, error) {
 	mrows, _ := m.Dims()
 	_, ncols := n.Dims()
@@ -19,6 +22,7 @@ func Dot(m, n mat.Matrix) (mat.Matrix, error) {
 	return o, nil
 }
 
+// Add the value of a float64 s to each element of the mat.Matrix m,
 func AddScalar(s float64, m mat.Matrix) mat.Matrix {
 	rows, cols := m.Dims()
 
@@ -32,6 +36,29 @@ func AddScalar(s float64, m mat.Matrix) mat.Matrix {
 	result.Add(result, m)
 
 	return result
+}
+
+// Add the value of the transposed mat.Vector v to the mat.Matrix m,
+// returns an error if m.Dims()[0] != v.Dims()[0].
+func AddVector(v mat.Vector, m mat.Matrix) (mat.Matrix, error) {
+	rows, cols := m.Dims()
+	vr, _ := v.Dims()
+
+	vt := v.T()
+
+	if vr != rows {
+		return nil, errorsutils.BuildError(nil, "dimension mismatch")
+	}
+
+	result := mat.NewDense(rows, cols, nil)
+
+	for r := 0; r < rows; r++ {
+		for c := 0; c < cols; c++ {
+			result.Set(r, c, m.At(r, c)+vt.At(0, c))
+		}
+	}
+
+	return result, nil
 }
 
 func MergeColumns(matrices ...mat.Matrix) (mat.Matrix, error) {
