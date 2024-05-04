@@ -6,10 +6,28 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
+func DotVector(a, b mat.Vector) (mat.Vector, error) {
+	arows, acols := a.Dims()
+	brows, bcols := b.Dims()
+
+	if arows != brows {
+		return nil, errorsutils.BuildError(nil, "dimension mismatch")
+	}
+
+	if acols != 1 || bcols != 1 {
+		return nil, errorsutils.BuildError(nil, "not a vector")
+	}
+
+	s := mat.Dot(a, b)
+	o := mat.NewVecDense(1, []float64{s})
+
+	return o, nil
+}
+
 // Dot product between the two mat.Matrix m and n,
 // returns an error if m.Dims()[0] != n.Dims()[1],
 // return a matrix of size r.Dims() == {m.Dims()[0], n.Dims()[1]}.
-func Dot(m, n mat.Matrix) (mat.Matrix, error) {
+func DotMatrix(m, n mat.Matrix) (mat.Matrix, error) {
 	mrows, _ := m.Dims()
 	_, ncols := n.Dims()
 
@@ -63,20 +81,29 @@ func AddVector(v mat.Vector, m mat.Matrix) (mat.Matrix, error) {
 
 func MergeColumns(matrices ...mat.Matrix) (mat.Matrix, error) {
 	rows, cols := matrices[0].Dims()
-	result := mat.NewDense(rows*len(matrices), cols, nil)
 
+	rcols := 0
+	for _, m := range matrices {
+		_, mc := m.Dims()
+		rcols += mc
+	}
+	result := mat.NewDense(rows, rcols, nil)
+
+	merged := 0
 	for i, m := range matrices {
 		mr, mc := m.Dims()
-
 		if mr != rows && mc != cols {
 			return nil, errorsutils.BuildError(nil, "dimension mismatch, for the %vth matrice", i)
 		}
-		for x := 0; x < rows; x++ {
-			for y := 0; y < cols; y++ {
-				el := m.At(x, y)
-				result.Set(i*rows+x, y, el)
+
+		for c := 0; c < mc; c++ {
+			for r := 0; r < mr; r++ {
+				el := m.At(r, c)
+				result.Set(r, c+merged, el)
 			}
 		}
+
+		merged += mc
 	}
 
 	return result, nil
@@ -85,21 +112,27 @@ func MergeColumns(matrices ...mat.Matrix) (mat.Matrix, error) {
 func MergeRows(matrices ...mat.Matrix) (mat.Matrix, error) {
 	rows, cols := matrices[0].Dims()
 
-	result := mat.NewDense(rows, cols*len(matrices), nil)
+	rrows := 0
+	for _, m := range matrices {
+		mr, _ := m.Dims()
+		rrows += mr
+	}
+	result := mat.NewDense(rrows, cols, nil)
+	merged := 0
 	for i, m := range matrices {
-
 		mr, mc := m.Dims()
 
 		if mr != rows && mc != cols {
 			return nil, errorsutils.BuildError(nil, "dimension mismatch, for the %vth matrice", i)
 		}
 
-		for x := 0; x < rows; x++ {
-			for y := 0; y < cols; y++ {
-				el := m.At(x, y)
-				result.Set(x, i*rows+y, el)
+		for r := 0; r < mr; r++ {
+			for c := 0; c < mc; c++ {
+				el := m.At(r, c)
+				result.Set(r+merged, c, el)
 			}
 		}
+		merged += mr
 	}
 
 	return result, nil

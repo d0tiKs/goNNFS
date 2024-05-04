@@ -23,9 +23,8 @@ func main() {
 	})
 	fmt.Printf("bias :\n  %.4f\n", mat.Formatted(bias, mat.Prefix("  ")))
 
-	prod, _ := matfunc.Dot(input, weights.T())
+	prod, _ := matfunc.DotMatrix(input, weights.T())
 	output, _ := matfunc.AddVector(bias, prod)
 
-	matfunc.
-		fmt.Printf("output :\n  %.4f\n", mat.Formatted(output, mat.Prefix("  ")))
+	fmt.Printf("output :\n  %.4f\n", mat.Formatted(output, mat.Prefix("  ")))
 }

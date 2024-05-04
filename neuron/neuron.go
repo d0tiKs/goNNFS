@@ -18,7 +18,7 @@ func main() {
 
 	bias := 2.0
 
-	prod, _ := matfunc.Dot(weights, input)
+	prod, _ := matfunc.DotMatrix(weights, input)
 	fmt.Printf("prod :\n  %.4f\n", mat.Formatted(prod, mat.Prefix("  ")))
 
 	output := matfunc.AddScalar(bias, prod)

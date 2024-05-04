@@ -27,11 +27,11 @@ func main() {
 	bias2 := 3.0
 	bias3 := 0.5
 
-	prod1, _ := matfunc.Dot(weights1, input)
+	prod1, _ := matfunc.DotMatrix(weights1, input)
 	neuron1 := matfunc.AddScalar(bias1, prod1)
-	prod2, _ := matfunc.Dot(weights2, input)
+	prod2, _ := matfunc.DotMatrix(weights2, input)
 	neuron2 := matfunc.AddScalar(bias2, prod2)
-	prod3, _ := matfunc.Dot(weights3, input)
+	prod3, _ := matfunc.DotMatrix(weights3, input)
 	neuron3 := matfunc.AddScalar(bias3, prod3)
 
 	output, _ := matfunc.MergeRows(neuron1, neuron2, neuron3)
