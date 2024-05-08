@@ -16,9 +16,7 @@ func TestDotVectorSuccess(test *testing.T) {
 	})
 
 	got, err := DotVector(v1, v2)
-	want := mat.NewVecDense(1, []float64{
-		20,
-	})
+	want := 20.0
 
 	if err != nil {
 
@@ -26,8 +24,8 @@ func TestDotVectorSuccess(test *testing.T) {
 		return
 	}
 
-	if !mat.EqualApprox(got, want, 0.0001) {
-		test.Errorf("got:\n%.4f\n want:\n%.4f\n", mat.Formatted(got, mat.Prefix("  ")), mat.Formatted(want, mat.Prefix("  ")))
+	if got != want {
+		test.Errorf("got: %.4f, want: %.4f", got, want)
 	}
 }
 
@@ -47,7 +45,7 @@ func TestDotVectorError(test *testing.T) {
 	}
 }
 
-func TestDotMatrixSuccess(test *testing.T) {
+func TestProductMatrixSuccess(test *testing.T) {
 	m1 := mat.NewDense(1, 3, []float64{
 		1, 2, 3,
 	})
@@ -56,7 +54,7 @@ func TestDotMatrixSuccess(test *testing.T) {
 		2, 3, 4,
 	})
 
-	got, err := DotMatrix(m1, m2)
+	got, err := ProductMatrix(m1, m2)
 	want := mat.NewDense(1, 1, []float64{
 		20,
 	})
@@ -72,7 +70,7 @@ func TestDotMatrixSuccess(test *testing.T) {
 	}
 }
 
-func TestDotMatrixError(test *testing.T) {
+func TestProductMatrixError(test *testing.T) {
 	m1 := mat.NewDense(1, 3, []float64{
 		1, 2, 3,
 	})
@@ -81,7 +79,7 @@ func TestDotMatrixError(test *testing.T) {
 		2, 3, 4, 5, 6, 7,
 	})
 
-	_, err := DotMatrix(m1, m2)
+	_, err := ProductMatrix(m1, m2)
 
 	if err == nil {
 		test.Errorf("Should return an error")

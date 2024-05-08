@@ -2,32 +2,55 @@ package matfunc
 
 import (
 	errorsutils "NNFS/utils/errors"
+	"fmt"
 
 	"gonum.org/v1/gonum/mat"
 )
 
-func DotVector(a, b mat.Vector) (mat.Vector, error) {
+// Format the data of a matrix in a humanreadble way
+//
+// Parameters:
+//   - m: a matrix (mat.Matrix)
+//
+// Return:
+//   - a string (string)
+func Format(m mat.Matrix) string {
+	return fmt.Sprintf("%.4f", mat.Formatted(m, mat.Prefix("")))
+}
+
+// Dot product between the two vectors a and b,
+//
+// Parameters:
+//   - a, b: vectors (mat.Vector)
+//
+// Return:
+//   - a scalar (float64)
+//   - an error (error) if a.Dims()[0] != b.Dims()[0],
+func DotVector(a, b mat.Vector) (float64, error) {
 	arows, acols := a.Dims()
 	brows, bcols := b.Dims()
 
 	if arows != brows {
-		return nil, errorsutils.BuildError(nil, "dimension mismatch")
+		return 0, errorsutils.BuildError(nil, "dimension mismatch")
 	}
 
 	if acols != 1 || bcols != 1 {
-		return nil, errorsutils.BuildError(nil, "not a vector")
+		return 0, errorsutils.BuildError(nil, "not a vector")
 	}
 
 	s := mat.Dot(a, b)
-	o := mat.NewVecDense(1, []float64{s})
-
-	return o, nil
+	return s, nil
 }
 
-// Dot product between the two mat.Matrix m and n,
-// returns an error if m.Dims()[0] != n.Dims()[1],
-// return a matrix of size r.Dims() == {m.Dims()[0], n.Dims()[1]}.
-func DotMatrix(m, n mat.Matrix) (mat.Matrix, error) {
+// Product between the two matrices m and n,
+//
+// Parameters:
+//   - m, n: matrices (mat.Matrix)
+//
+// Return:
+//   - a matrix (mat.MAtrix) of dimentions: r.Dims() == {m.Dims()[0], n.Dims()[1]}
+//   - an error (error) if m.Dims()[0] != n.Dims()[1]
+func ProductMatrix(m, n mat.Matrix) (mat.Matrix, error) {
 	mrows, _ := m.Dims()
 	_, ncols := n.Dims()
 
@@ -40,7 +63,11 @@ func DotMatrix(m, n mat.Matrix) (mat.Matrix, error) {
 	return o, nil
 }
 
-// Add the value of a float64 s to each element of the mat.Matrix m,
+// Add the value of a sclacar s to each element of the matrix m,
+//
+// Parameters:
+//   - s: a scalar (float64)
+//   - m: a matrix (mat.Matrix)
 func AddScalar(s float64, m mat.Matrix) mat.Matrix {
 	rows, cols := m.Dims()
 
@@ -56,8 +83,15 @@ func AddScalar(s float64, m mat.Matrix) mat.Matrix {
 	return result
 }
 
-// Add the value of the transposed mat.Vector v to the mat.Matrix m,
-// returns an error if m.Dims()[0] != v.Dims()[0].
+// Add the value of the transposed vector v to the matrix m,
+//
+// Parameters:
+//   - v: a vector (mat.Vector)
+//   - m: a matrix (mat.Matrix)
+//
+// Return:
+//   - a matrix (mat.Matrix)
+//   - an error error if m.Dims()[0] != v.Dims()[0].
 func AddVector(v mat.Vector, m mat.Matrix) (mat.Matrix, error) {
 	rows, cols := m.Dims()
 	vr, _ := v.Dims()
@@ -75,10 +109,17 @@ func AddVector(v mat.Vector, m mat.Matrix) (mat.Matrix, error) {
 			result.Set(r, c, m.At(r, c)+vt.At(0, c))
 		}
 	}
-
 	return result, nil
 }
 
+// Merge a list of matrices collums wise
+//
+// Parameters:
+//   - matrices: a slice of matrix ([]mat.Matrix)
+//
+// Return:
+//   - a matrice (mat.Matrix)
+//   - an error (error) if at least once of the matrices doesn't match the rows dimention of the first matrix in the list:
 func MergeColumns(matrices ...mat.Matrix) (mat.Matrix, error) {
 	rows, cols := matrices[0].Dims()
 
@@ -109,6 +150,14 @@ func MergeColumns(matrices ...mat.Matrix) (mat.Matrix, error) {
 	return result, nil
 }
 
+// Merge a list of matrices rows wise
+//
+// Parameters:
+//   - matrices: a slice of matrix ([]mat.Matrix)
+//
+// Return:
+//   - a matrice (mat.Matrix)
+//   - an error (error) if at least once of the matrices doesn't match the collumn dimention of the first matrix in the list:
 func MergeRows(matrices ...mat.Matrix) (mat.Matrix, error) {
 	rows, cols := matrices[0].Dims()
 

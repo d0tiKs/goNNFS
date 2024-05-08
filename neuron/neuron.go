@@ -1,7 +1,7 @@
 package main
 
 import (
-	matfunc "NNFS/utils/matrix"
+	matfunc "NNFS/utils/math/matrix"
 	"fmt"
 
 	"gonum.org/v1/gonum/mat"
@@ -18,7 +18,7 @@ func main() {
 
 	bias := 2.0
 
-	prod, _ := matfunc.DotMatrix(weights, input)
+	prod, _ := matfunc.ProductMatrix(weights, input)
 	fmt.Printf("prod :\n  %.4f\n", mat.Formatted(prod, mat.Prefix("  ")))
 
 	output := matfunc.AddScalar(bias, prod)
