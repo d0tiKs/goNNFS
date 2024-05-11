@@ -15,7 +15,7 @@ import (
 // Return:
 //   - a string (string)
 func Format(m mat.Matrix) string {
-	return fmt.Sprintf("%.4f", mat.Formatted(m, mat.Prefix("")))
+	return fmt.Sprintf("%.3f", mat.Formatted(m, mat.Prefix("")))
 }
 
 // Dot product between the two vectors a and b,
@@ -31,7 +31,7 @@ func DotVector(a, b mat.Vector) (float64, error) {
 	brows, bcols := b.Dims()
 
 	if arows != brows {
-		return 0, errorsutils.BuildError(nil, "dimension mismatch")
+		return 0, errorsutils.BuildError(nil, "dimension mismatch (%v,%v) (%v,%v)", arows, acols, brows, bcols)
 	}
 
 	if acols != 1 || bcols != 1 {
@@ -42,7 +42,7 @@ func DotVector(a, b mat.Vector) (float64, error) {
 	return s, nil
 }
 
-// Product between the two matrices m and n,
+// Product between two matrices m and n,
 //
 // Parameters:
 //   - m, n: matrices (mat.Matrix)
@@ -51,16 +51,40 @@ func DotVector(a, b mat.Vector) (float64, error) {
 //   - a matrix (mat.MAtrix) of dimentions: r.Dims() == {m.Dims()[0], n.Dims()[1]}
 //   - an error (error) if m.Dims()[0] != n.Dims()[1]
 func ProductMatrix(m, n mat.Matrix) (mat.Matrix, error) {
-	mrows, _ := m.Dims()
-	_, ncols := n.Dims()
+	mrows, mcols := m.Dims()
+	nrows, ncols := n.Dims()
 
-	if mrows != ncols {
-		return nil, errorsutils.BuildError(nil, "dimension mismatch")
+	if mcols != nrows {
+		return nil, errorsutils.BuildError(nil, "dimension mismatch (%v,%v) (%v,%v)", mrows, mcols, nrows, ncols)
 	}
 
 	o := mat.NewDense(mrows, ncols, nil)
 	o.Product(m, n)
 	return o, nil
+}
+
+// Product between a matrice m and vector v,
+//
+// Parameters:
+//   - m: matrice (mat.Matrix)
+//   - v: vector (mat.Vector)
+//
+// Return:
+//   - a vector (mat.Vector) of dimentions: v.Dims() == {v.Dims()[0], 1}
+//   - an error (error) if m.Dims()[1] != n.Dims()[0]
+func ProductMatVec(m mat.Matrix, v mat.Vector) (mat.Vector, error) {
+	mr, mc := m.Dims()
+	nr, nc := v.Dims()
+
+	fmt.Printf("(%v,%v) (%v,%v)\n", mr, mc, nr, nc)
+
+	if mc != nr {
+		return nil, errorsutils.BuildError(nil, "dimension mismatch (%v,%v) (%v,%v)", mr, mc, nr, nc)
+	}
+
+	r := mat.NewVecDense(mr, nil)
+	r.MulVec(m, v)
+	return r, nil
 }
 
 // Add the value of a sclacar s to each element of the matrix m,
@@ -93,20 +117,18 @@ func AddScalar(s float64, m mat.Matrix) mat.Matrix {
 //   - a matrix (mat.Matrix)
 //   - an error error if m.Dims()[0] != v.Dims()[0].
 func AddVector(v mat.Vector, m mat.Matrix) (mat.Matrix, error) {
-	rows, cols := m.Dims()
-	vr, _ := v.Dims()
+	mr, mc := m.Dims()
+	vr, vc := v.Dims()
 
-	vt := v.T()
-
-	if vr != rows {
-		return nil, errorsutils.BuildError(nil, "dimension mismatch")
+	if vr != mr {
+		return nil, errorsutils.BuildError(nil, "dimension mismatch (%v,%v) (%v,%v)", mr, mc, vr, vc)
 	}
 
-	result := mat.NewDense(rows, cols, nil)
+	result := mat.NewDense(mr, mc, nil)
 
-	for r := 0; r < rows; r++ {
-		for c := 0; c < cols; c++ {
-			result.Set(r, c, m.At(r, c)+vt.At(0, c))
+	for r := 0; r < vr; r++ {
+		for c := 0; c < mc; c++ {
+			result.Set(r, c, m.At(r, c)+v.At(r, 0))
 		}
 	}
 	return result, nil
@@ -134,7 +156,7 @@ func MergeColumns(matrices ...mat.Matrix) (mat.Matrix, error) {
 	for i, m := range matrices {
 		mr, mc := m.Dims()
 		if mr != rows && mc != cols {
-			return nil, errorsutils.BuildError(nil, "dimension mismatch, for the %vth matrice", i)
+			return nil, errorsutils.BuildError(nil, "dimension mismatch (%v,%v) (%v,%v), for the %vth matrice", rows, cols, mr, mc, i)
 		}
 
 		for c := 0; c < mc; c++ {
@@ -172,7 +194,7 @@ func MergeRows(matrices ...mat.Matrix) (mat.Matrix, error) {
 		mr, mc := m.Dims()
 
 		if mr != rows && mc != cols {
-			return nil, errorsutils.BuildError(nil, "dimension mismatch, for the %vth matrice", i)
+			return nil, errorsutils.BuildError(nil, "dimension mismatch (%v,%v) (%v,%v), for the %vth matrice", rows, cols, mr, mc, i)
 		}
 
 		for r := 0; r < mr; r++ {
