@@ -4,6 +4,7 @@ import (
 	mathutils "NNFS/utils/math"
 	"fmt"
 	"math"
+	"math/rand"
 
 	"gonum.org/v1/plot/plotter"
 )
@@ -38,10 +39,11 @@ func GenerateSpiral(count, classes uint, noise float64) Dataset {
 		theta := LinearSpace(float64(class*4), float64((class+1)*4), count, 4)
 		for i := 0; i < int(count); i++ {
 			idx := (class * int(count)) + i
+			nt := theta[i] + noise*rand.NormFloat64()
 
 			dataset[idx] = plotter.XY{
-				X: radius[i] * math.Sin(theta[i]),
-				Y: radius[i] * math.Cos(theta[i]),
+				X: radius[i] * math.Sin(nt),
+				Y: radius[i] * math.Cos(nt),
 			}
 			labels[idx] = Label{
 				text: fmt.Sprintf("%v", class),
