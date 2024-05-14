@@ -1,7 +1,6 @@
 package data
 
 import (
-	"reflect"
 	"testing"
 )
 
@@ -15,7 +14,10 @@ func TestLinearSpace(test *testing.T) {
 		0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1,
 	}
 
-	if !reflect.DeepEqual(got, want) {
-		test.Errorf("got: %v,\nwant: %v", got, want)
+	for i := 0; i < count; i++ {
+		if got[i] != want[i] {
+			test.Errorf("got: %v,\nwant: %v", got, want)
+			break
+		}
 	}
 }
