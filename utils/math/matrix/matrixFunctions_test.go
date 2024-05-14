@@ -71,7 +71,7 @@ func TestProductMatrixSuccess(test *testing.T) {
 }
 
 func TestProductMatrixError(test *testing.T) {
-	m1 := mat.NewDense(1, 3, []float64{
+	m1 := mat.NewDense(3, 1, []float64{
 		1, 2, 3,
 	})
 

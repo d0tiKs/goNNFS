@@ -116,19 +116,19 @@ func AddScalar(s float64, m mat.Matrix) mat.Matrix {
 // Return:
 //   - a matrix (mat.Matrix)
 //   - an error error if m.Dims()[0] != v.Dims()[0].
-func AddVector(v mat.Vector, m mat.Matrix) (mat.Matrix, error) {
+func AddVector(v mat.Vector, m mat.Matrix) (*mat.Dense, error) {
 	mr, mc := m.Dims()
 	vr, vc := v.Dims()
 
-	if vr != mr {
+	if vr != mc {
 		return nil, errorsutils.BuildError(nil, "dimension mismatch (%v,%v) (%v,%v)", mr, mc, vr, vc)
 	}
 
 	result := mat.NewDense(mr, mc, nil)
 
-	for r := 0; r < vr; r++ {
+	for r := 0; r < mr; r++ {
 		for c := 0; c < mc; c++ {
-			result.Set(r, c, m.At(r, c)+v.At(r, 0))
+			result.Set(r, c, m.At(r, c)+v.AtVec(c))
 		}
 	}
 	return result, nil
