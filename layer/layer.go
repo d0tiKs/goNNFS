@@ -1,6 +1,7 @@
 package main
 
 import (
+	"NNFS/utils/data"
 	matfunc "NNFS/utils/math/matrix"
 	neuralnetwork "NNFS/utils/neuralNetwork"
 	"fmt"
@@ -9,21 +10,23 @@ import (
 )
 
 func main() {
+	points := 100
+	classes := 3
 	inputSize := 2
 	neuronCount := 3
 
-	input := mat.NewVecDense(inputSize, []float64{
-		1.0, 2.0,
-	})
+	X := data.GenerateSpiral(uint(points), uint(classes), 0.2)
+
+	data := mat.NewDense(points*classes, 2, nil)
+
+	for i, point := range X.Points {
+		data.SetRow(i, []float64{point.X, point.Y})
+	}
 
 	layer := neuralnetwork.DenseLayer{}
 
 	layer.Init(uint(inputSize), uint(neuronCount))
-	layer.Input = input
 
-	fmt.Println("")
-	fmt.Println(matfunc.Format(layer.Weights))
-
-	layer.Forward()
+	layer.Forward(data)
 	fmt.Println(matfunc.Format(layer.Output))
 }
