@@ -25,8 +25,11 @@ func main() {
 
 	layer := neuralnetwork.DenseLayer{}
 
-	layer.Init(uint(inputSize), uint(neuronCount))
+	layer.Init(uint(inputSize), uint(neuronCount), neuralnetwork.ReLU)
 
 	layer.Forward(data)
+	fmt.Println(matfunc.Format(layer.Output))
+
+	layer.Activate()
 	fmt.Println(matfunc.Format(layer.Output))
 }

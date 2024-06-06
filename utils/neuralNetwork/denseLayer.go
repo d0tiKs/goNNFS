@@ -9,9 +9,10 @@ import (
 )
 
 type DenseLayer struct {
-	Weights *mat.Dense
-	Biases  *mat.VecDense
-	Output  *mat.Dense
+	Weights    *mat.Dense
+	Biases     *mat.VecDense
+	Output     *mat.Dense
+	Activation func(*mat.Dense)
 }
 
 // Initialize a Dense layer with random weights
@@ -19,9 +20,8 @@ type DenseLayer struct {
 // Parameters:
 //   - inputSize(uint): the numbers of features of the input
 //   - neuronsCount(uint): the number of neuron in the layer
-func (layer *DenseLayer) Init(inputSize, neuronsCount uint) {
+func (layer *DenseLayer) Init(inputSize, neuronsCount uint, activation func(*mat.Dense)) {
 	layer.Biases = mat.NewVecDense(int(neuronsCount), nil)
-
 	layer.Weights = mat.NewDense(int(inputSize), int(neuronsCount), nil)
 
 	for i := 0; i < int(inputSize); i++ {
@@ -29,6 +29,8 @@ func (layer *DenseLayer) Init(inputSize, neuronsCount uint) {
 			layer.Weights.Set(i, j, .1*rand.Float64())
 		}
 	}
+
+	layer.Activation = activation
 }
 
 // Forward the input to the layer and compute the output
@@ -47,4 +49,8 @@ func (layer *DenseLayer) Forward(inputs *mat.Dense) {
 		// FIX: return error instead of panic
 		panic(errorsutils.BuildError(err, "error while forwarding : product + bias"))
 	}
+}
+
+func (layer *DenseLayer) Activate() {
+	layer.Activation(layer.Output)
 }
